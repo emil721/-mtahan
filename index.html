@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF İmtahan Sistemi</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+}
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+h1, h2 {
+    color: #333;
+}
+button{
+    padding:12px 20px;
+    cursor:pointer;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-right: 5px;
+    transition: 0.2s;
+}
+button:hover{
+    background: #0056b3;
+}
+.option{
+    border:1px solid #ccc;
+    padding:12px;
+    margin:8px 0;
+    border-radius:8px;
+    cursor:pointer;
+    transition: 0.2s;
+}
+.option:hover{
+    background:#eee;
+}
+.option.selected {
+    background: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+    font-weight: bold;
+}
+#examArea, #resultArea{
+    display:none;
+}
+#timer{
+    color:red;
+    font-size:24px;
+    font-weight:bold;
+    text-align: right;
+}
+.navigation-buttons {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+/* --- Nəticə Hesabatı üçün CSS --- */
+#resultDetails {
+    margin-top: 30px;
+}
+.result-block {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #fff;
+}
+.result-block.correct-block {
+    border-left: 5px solid green;
+}
+.result-block.wrong-block {
+    border-left: 5px solid red;
+}
+.result-block.empty-block {
+    border-left: 5px solid orange;
+}
+.result-question {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+.result-answer {
+    padding: 8px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+.your-answer {
+    color: #333;
+}
+.correct-answer {
+    font-weight: bold;
+    color: green;
+}
+.wrong-answer {
+    font-weight: bold;
+    color: red;
+}
+.label {
+    font-weight: bold;
+    color: #555;
+    margin-right: 5px;
+}
+
+#menuButton{
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    font-size: 32px;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+#sideMenu{
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 280px;
+    height: 100%;
+    background: white;
+    padding: 20px;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+    z-index: 9998;
+    overflow-x:hidden;
+}
+
+#sideMenu.open{
+    right: 0;
+}
+
+#sideMenu button{
+    width:100%;
+    padding:14px;
+    margin:6px 0;
+    background:#f8f9fa;
+    color:#333;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    text-align:left;
+    font-weight:500;
+}
+
+#sideMenu button:hover{
+    background:#eef2f7;
+}
+.about-card{
+    background:#fff;
+    padding:20px;
+    margin:15px 0;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    text-align:left;
+}
+
+.about-card h2{
+    margin-top:0;
+}
+}
+
+</style>
+
+</head>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<body>
+
+
+<div id="menuButton" onclick="toggleMenu()">☰</div>
+
+<div id="sideMenu">
+    <h3>Menyu</h3>
+
+<button onclick="goHome()">
+Ana Səhifə
+</button>
+
+<button onclick="showHistory()">
+İmtahan Tarixçəsi
+</button>
+
+<button onclick="showAbout()">
+Haqqında
+</button>
+
+<button onclick="showSupport()">
+Texniki Dəstək
+</button>
+
+
+</div>
+
+<div class="container">
+
+<h1>PDF İmtahan Sistemi</h1>
+
+<div id="setup">
+    <p>Zəhmət olmasa imtahan PDF-ni yükləyin (Suallar nömrələnmiş, variantlar • və ya √ ilə ayrılmış olmalıdır):</p>
+
+    <input type="file" id="pdfFile" accept=".pdf">
+
+    <br><br>
+
+<h3>İmtahan Növü</h3>
+
+<button type="button" onclick="setSemester()">Semestr İmtahanı</button>
+
+<button type="button" onclick="setColloquium()">Kollekvium</button>
+
+<br><br>
+
+    <h3>Sual Aralığı</h3>
+
+    <label>Başlanğıc sual:</label>
+    <input type="number" id="startQuestion" min="1" value="1">
+
+    <br><br>
+
+    <label>Son sual:</label>
+    <input type="number" id="endQuestion" min="1" value="50">
+
+    <br><br>
+
+    <h3>İmtahan Müddəti</h3>
+
+    <select id="examTime">
+    <option value="50" selected>50 dəqiqə</option>
+    <option value="60">60 dəqiqə</option>
+    <option value="70">70 dəqiqə</option>
+    <option value="80">80 dəqiqə</option>
+    <option value="90">90 dəqiqə</option>
+</select>
+
+    <br><br>
+
+    <button onclick="startExam()">İmtahana Başla</button>
+<br><br>
+
+
+</div>
+
+<div id="examArea">
+    <div id="timer">00:00</div>
+    <hr>
+    <div id="questionNumber" style="font-weight: bold; color: #555;"></div>
+    <div id="questionText"></div>
+    <div id="options"></div>
+
+    <div class="navigation-buttons">
+        <button onclick="prevQuestion()">Geri</button>
+        <button onclick="nextQuestion()">İrəli</button>
+        <button onclick="finishExam()" style="background: #dc3545; float: right;">İmtahanı Bitir</button>
+    </div>
+</div>
+
+<div id="resultArea">
+    <h2>İmtahan Nəticəsi</h2>
+    <hr>
+    <h3 id="correctCount" style="color: green;"></h3>
+    <h3 id="wrongCount" style="color: red;"></h3>
+    <h3 id="emptyCount" style="color: orange;"></h3>
+    <h3 id="scorePercent"></h3>
+    <br>
+   <button onclick="restartExam()">Yenidən Başla</button>
+    
+    <div id="resultDetails"></div>
+</div>
+
+</div>
+
+<div id="historyArea" style="display:none;">
+    <h2>📜 Keçmiş İmtahanlar</h2>
+
+<button onclick="closeHistory()">
+    Geri Qayıt
+</button>
+
+    <div id="historyList"></div>
+</div>
+
+<div id="aboutArea" style="display:none;">
+
+    <h1>Haqqımızda</h1>
+
+    <button onclick="goHome()">
+        Ana Səhifə
+    </button>
+
+
+
+    <div class="about-card">
+        <h2>Platforma Haqqında</h2>
+        <p>
+            PDF İmtahan Sistemi UNEC tələbələri üçün hazırlanmış akademik dəstək platformasıdır.
+            Sistem tələbələrə PDF formatlı sual bankları üzərində imtahan məşqləri etməyə imkan verir.
+        </p>
+    </div>
+
+    <div class="about-card">
+        <h2>Missiyamız</h2>
+        <p>
+            Tələbələrin imtahanlara daha effektiv hazırlaşmasına kömək etmək,
+            tədris materiallarını daha əlçatan və rahat formada təqdim etməkdir.
+        </p>
+    </div>
+
+    <div class="about-card">
+        <h2>Niyə Biz?</h2>
+        <ul>
+            <li>UNEC tələbələri üçün hazırlanmışdır</li>
+            <li>Sürətli və rahat istifadə</li>
+            <li>PDF sualların avtomatik emalı</li>
+            <li>İmtahan tarixçəsinin saxlanılması</li>
+            <li>Daim təkmilləşdirilən sistem</li>
+        </ul>
+    </div>
+
+</div>
+
+</div>
+
+<div id="supportArea" style="display:none;">
+
+    <h1>Texniki Dəstək</h1>
+
+    <button onclick="goHome()">
+        Ana Səhifə
+    </button>
+
+    <div class="about-card">
+
+        <input
+            type="email"
+            id="userEmail"
+            placeholder="E-mail ünvanınız"
+            style="width:100%;padding:10px;">
+
+        <br><br>
+
+        <textarea
+            id="userMessage"
+            rows="6"
+            placeholder="Probleminizi ətraflı təsvir edin"
+            style="width:100%;padding:10px;"></textarea>
+
+        <br><br>
+
+        <button onclick="sendSupport()">
+            Göndər
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+
+let questions = [];
+let currentQuestion = 0;
+let answers = {};
+let timerInterval;
+let examMinutes = 90;
+let examType = "";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+
+
+async function startExam(){
+    const file = document.getElementById("pdfFile").files[0];
+
+if(examType === ""){
+
+        alert("Zəhmət olmasa əvvəlcə imtahan növünü seçin.");
+
+        return;
+
+    }
+
+   
+
+    if(!file){
+        alert("Zəhmət olmasa əvvəlcə bir PDF faylı seçin.");
+        return;
+    }
+
+    const pdfData = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+    let fullText = "";
+
+    for(let i=1; i<=pdf.numPages; i++){
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const text = content.items.map(x=>x.str).join(" ");
+        fullText += "\n" + text;
+    }
+
+
+    
+
+parseQuestions(fullText);
+
+const startQ = parseInt(document.getElementById("startQuestion").value);
+const endQ = parseInt(document.getElementById("endQuestion").value);
+
+let selectedQuestions = questions.slice(startQ - 1, endQ);
+
+selectedQuestions = shuffleArray(selectedQuestions);
+
+if(examType === "semester"){
+
+    questions = selectedQuestions.slice(0, 50);
+
+}else if(examType === "colloquium"){
+
+    questions = selectedQuestions.slice(0, 30);
+
+}
+
+    if(questions.length === 0) {
+        alert("PDF-dən sual oxumaq mümkün olmadı. Formatın düzgün olduğundan əmin olun (1., •, √).");
+        return;
+    }
+
+   
+
+    document.getElementById("setup").style.display="none";
+document.getElementById("examArea").style.display="block";
+document.getElementById("menuButton").style.display="none";
+
+examMinutes = Number(document.getElementById("examTime").value);
+
+startTimer();
+showQuestion();
+
+}
+
+
+function parseQuestions(text){
+    questions = [];
+    const blocks = text.split(/\d+\./g);
+
+    blocks.forEach(block=>{
+        block = block.trim();
+        if(!block) return;
+
+        const lines = block.split(/(?=[•√])/g).map(x=>x.trim()).filter(Boolean);
+
+        if(lines.length < 2) return; 
+
+        const questionText = lines[0];
+        const rawOptionsWithSymbols = lines.slice(1);
+
+        let correctText = "";
+        let finalOptions = [];
+
+        rawOptionsWithSymbols.forEach(opt => {
+            let cleanOpt = opt.replace(/^[•√]\s*/, "").trim();
+            
+            if(opt.startsWith("√")) {
+                correctText = cleanOpt;
+            }
+            
+            if(cleanOpt) {
+                finalOptions.push(cleanOpt);
+            }
+        });
+
+        if(!correctText && finalOptions.length > 0) {
+            correctText = finalOptions[0]; 
+        }
+
+        const shuffledOpts = shuffleArray(finalOptions);
+
+        questions.push({
+            question: questionText,
+            options: shuffledOpts,
+            correct: correctText 
+        });
+    });
+}
+
+function showQuestion(){
+    const q = questions[currentQuestion];
+
+    document.getElementById("questionNumber").innerHTML =
+    "Sual " + (currentQuestion+1) + " / " + questions.length;
+
+    document.getElementById("questionText").innerHTML =
+    "<h3>" + q.question + "</h3>";
+
+    const box = document.getElementById("options");
+    box.innerHTML="";
+
+    q.options.forEach((option, index)=>{
+        const div = document.createElement("div");
+        div.className = "option";
+        
+        if(answers[currentQuestion] === option) {
+            div.className += " selected";
+        }
+
+        div.textContent = option;
+
+        div.onclick = () => {
+            answers[currentQuestion] = option;
+            showQuestion(); 
+        };
+
+        box.appendChild(div);
+    });
+}
+
+function nextQuestion(){
+    if(currentQuestion < questions.length-1){
+        currentQuestion++;
+        showQuestion();
+    }
+}
+
+function prevQuestion(){
+    if(currentQuestion > 0){
+        currentQuestion--;
+        showQuestion();
+    }
+}
+
+// --- YENİLƏNMİŞ HESABAT ARDICILLIĞI FUNKSİYASI ---
+
+function setSemester(){
+
+    examType = "semester";
+
+    document.getElementById("examTime").innerHTML = `
+        <option value="50" selected>50 dəqiqə</option>
+        <option value="60">60 dəqiqə</option>
+        <option value="70">70 dəqiqə</option>
+        <option value="80">80 dəqiqə</option>
+        <option value="90">90 dəqiqə</option>
+    `;
+
+    document.getElementById("startQuestion").value = "1";
+    document.getElementById("endQuestion").value = "50";
+}
+
+function setColloquium(){
+
+    examType = "colloquium";
+
+    document.getElementById("examTime").innerHTML = `
+        <option value="30" selected>30 dəqiqə</option>
+        <option value="50">50 dəqiqə</option>
+    `;
+
+    document.getElementById("startQuestion").value = "1";
+    document.getElementById("endQuestion").value = "30";
+}
+
+
+
+function finishExam(){
+
+if(!confirm("İmtahanı bitirmək istədiyinizə əminsiniz?")){
+
+        return;
+
+    }
+
+    clearInterval(timerInterval); 
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    let emptyCount = 0;
+
+    const resultDetailsBox = document.getElementById("resultDetails");
+    resultDetailsBox.innerHTML = "<h2>Detallı Hesabat (Səhvlər ➔ Boşlar ➔ Düzlər ardıcıllığı ilə):</h2>";
+
+    // Sualları 3 qrupa ayırmaq üçün HTML torbaları yaradırıq
+    let wrongQuestionsHtml = "";  // 1. Səhvlər (Qırmızı)
+    let emptyQuestionsHtml = "";  // 2. Boşlar (Narıncı)
+    let correctQuestionsHtml = ""; // 3. Düzlər (Yaşıl)
+
+    questions.forEach((q, index) => {
+        const userAnswer = answers[index];
+        let statusClass = ""; 
+        let userAnswerHtml = "";
+        let currentBlockHtml = "";
+        let targetGroup = "wrong"; // Şərti olaraq qrup adı
+
+        if(!userAnswer) {
+            emptyCount++;
+            statusClass = "empty-block";
+            userAnswerHtml = `<span class="your-answer label" style="color: orange;">Cavab vermədiniz.</span>`;
+            targetGroup = "empty";
+        } else if(userAnswer === q.correct) {
+            correctCount++;
+            statusClass = "correct-block";
+            userAnswerHtml = `<span class="your-answer correct-answer"><span class="label">Cavabınız:</span>${userAnswer} (Düz)</span>`;
+            targetGroup = "correct";
+        } else {
+            wrongCount++;
+            statusClass = "wrong-block";
+            userAnswerHtml = `<span class="your-answer wrong-answer"><span class="label">Cavabınız:</span>${userAnswer} (Səhv)</span>`;
+            targetGroup = "wrong";
+        }
+
+        currentBlockHtml = `
+            <div class="result-block ${statusClass}">
+                <div class="result-question">Sual ${index + 1}: ${q.question}</div>
+                <div class="result-answer">${userAnswerHtml}</div>
+                <div class="result-answer"><span class="correct-answer"><span class="label">Düzgün cavab:</span>${q.correct}</span></div>
+            </div>
+        `;
+
+        // Bloku öz aid olduğu kateqoriyanın içinə atırıq
+        if(targetGroup === "wrong") {
+            wrongQuestionsHtml += currentBlockHtml;
+        } else if(targetGroup === "empty") {
+            emptyQuestionsHtml += currentBlockHtml;
+        } else {
+            correctQuestionsHtml += currentBlockHtml;
+        }
+    });
+
+    // Ekranda tam istədiyin ardıcıllıqla birləşdiririk: Səhv -> Boş -> Düz
+    resultDetailsBox.innerHTML += wrongQuestionsHtml + emptyQuestionsHtml + correctQuestionsHtml;
+
+    document.getElementById("examArea").style.display = "none";
+    document.getElementById("resultArea").style.display = "block";
+
+    document.getElementById("correctCount").textContent = "Düzgün cavablar: " + correctCount;
+    document.getElementById("wrongCount").textContent = "Səhv cavablar: " + wrongCount;
+    document.getElementById("emptyCount").textContent = "Cavabsız (Boş): " + emptyCount;
+    document.getElementById("menuButton").style.display="none";
+
+    let percent = Math.round((correctCount / questions.length) * 100);
+    document.getElementById("scorePercent").textContent = "Müvəffəqiyyət faizi: " + percent + "%";
+
+// Tarixçə yadda saxla
+
+let history = JSON.parse(localStorage.getItem("examHistory")) || [];
+
+// 1 ildən köhnələri sil
+const oneYearAgo = Date.now() - (365 * 24 * 60 * 60 * 1000);
+
+history = history.filter(item =>
+    new Date(item.date).getTime() > oneYearAgo
+);
+
+// Yeni nəticə əlavə et
+history.push({
+    date: new Date().toISOString(),
+    examType: examType,
+    correct: correctCount,
+    wrong: wrongCount,
+    empty: emptyCount,
+    percent: percent,
+    total: questions.length
+});
+
+// Son 100 nəticə qalsın
+if(history.length > 100){
+    history = history.slice(-100);
+}
+
+localStorage.setItem(
+    "examHistory",
+    JSON.stringify(history)
+);
+    
+    window.scrollTo(0, 0);
+}
+
+function shuffleArray(array){
+    return [...array].sort(()=>Math.random()-0.5);
+}
+
+function startTimer(){
+
+    let time = examMinutes * 60;
+
+    const timer = document.getElementById("timer");
+
+    timer.textContent =
+        String(examMinutes).padStart(2,"0") + ":00";
+
+    timerInterval = setInterval(()=>{
+
+        let min = Math.floor(time / 60);
+        let sec = time % 60;
+
+        timer.textContent =
+            String(min).padStart(2,"0")
+            + ":"
+            + String(sec).padStart(2,"0");
+
+        time--;
+
+        if(time < 0){
+            clearInterval(timerInterval);
+
+            if(confirm("Vaxt bitdi. İmtahanı yekunlaşdırmaq istəyirsiniz?")){
+                finishExam();
+            }
+        }
+
+    },1000);
+}
+
+function restartExam(){
+
+    currentQuestion = 0;
+    answers = {};
+
+    clearInterval(timerInterval);
+
+    document.getElementById("resultArea").style.display = "none";
+    document.getElementById("examArea").style.display = "none";
+    document.getElementById("setup").style.display = "block";
+
+document.getElementById("menuButton").style.display="block";
+
+}
+
+function showHistory(){
+
+document
+.getElementById("sideMenu")
+.classList.remove("open");
+    
+let history =
+    JSON.parse(localStorage.getItem("examHistory")) || [];
+
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("historyArea").style.display = "block";
+
+    const list =
+    document.getElementById("historyList");
+
+    list.innerHTML = "";
+
+    if(history.length === 0){
+        list.innerHTML =
+        "<p>Hələ heç bir imtahan yoxdur.</p>";
+        return;
+    }
+
+    history.reverse().forEach((h,i)=>{
+
+        const date =
+        new Date(h.date).toLocaleString("az-AZ");
+
+        list.innerHTML += `
+<div class="result-block history-card">
+                <h3>İmtahan ${history.length-i}</h3>
+
+                <p><b>Tarix:</b> ${date}</p>
+
+                <p><b>Nəticə:</b>
+                ${h.correct}/${h.total}</p>
+
+                <p><b>Faiz:</b>
+                ${h.percent}%</p>
+
+                <p><b>Səhv:</b>
+                ${h.wrong}</p>
+
+                <p><b>Boş:</b>
+                ${h.empty}</p>
+            </div>
+        `;
+    });
+}
+
+function closeHistory(){
+
+    document.getElementById("historyArea").style.display = "none";
+
+    document.getElementById("setup").style.display = "block";
+
+}
+
+function toggleMenu(){
+    document
+        .getElementById("sideMenu")
+        .classList
+        .toggle("open");
+}
+
+
+function goHome(){
+
+    document.getElementById("historyArea").style.display="none";
+
+    document.getElementById("aboutArea").style.display="none";
+
+    document.getElementById("supportArea").style.display="none";
+
+    document.getElementById("setup").style.display="block";
+}
+
+function showAbout(){
+
+    document.getElementById("setup").style.display="none";
+    document.getElementById("historyArea").style.display="none";
+    document.getElementById("aboutArea").style.display="block";
+
+    document.getElementById("sideMenu")
+        .classList.remove("open");
+}
+
+function showSupport(){
+
+    document.getElementById("setup").style.display="none";
+
+    document.getElementById("historyArea").style.display="none";
+
+    document.getElementById("aboutArea").style.display="none";
+
+    document.getElementById("supportArea").style.display="block";
+
+    document.getElementById("sideMenu")
+        .classList.remove("open");
+}
+
+emailjs.init("sX8fwdW1wDTgSfKub");
+
+function sendSupport(){
+
+    const email =
+        document.getElementById("userEmail").value;
+
+    const message =
+        document.getElementById("userMessage").value;
+
+    if(!email || !message){
+
+        alert("Bütün xanaları doldurun.");
+        return;
+    }
+
+    emailjs.send(
+        "service_v2jtmvu",
+        "template_70cyh5k",
+        {
+            user_email: email,
+            message: message,
+            time: new Date().toLocaleString("az-AZ")
+        }
+    )
+   
+.then(function(){
+
+    emailjs.send(
+        "service_v2jtmvu",
+        "template_rrrvw1l",
+        {
+            user_email: email,
+            message: message,
+            time: new Date().toLocaleString("az-AZ")
+        }
+    );
+
+    document.getElementById("successPopup").style.display = "block";
+
+    document.getElementById("userEmail").value = "";
+
+    document.getElementById("userMessage").value = "";
+
+})
+.catch(function(error){
+
+    console.log("EMAILJS ERROR:", error);
+
+    alert(JSON.stringify(error));
+
+});
+
+}
+
+
+</script>
+
+<div id="successPopup" style="
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 0 20px rgba(0,0,0,0.2);
+z-index:99999;
+text-align:center;
+width:300px;
+">
+
+<h2 style="color:green;">✓</h2>
+
+<h3>Müraciət göndərildi</h3>
+
+<p>
+Sorğunuz uğurla qəbul edildi.
+Ən qısa zamanda baxılacaq.
+</p>
+
+<button onclick="
+document.getElementById('successPopup').style.display='none'
+">
+Bağla
+</button>
+
+</div>
+
+</body>
+</html>
