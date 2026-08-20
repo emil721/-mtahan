@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="PDF fayllarından avtomatik imtahan yaradan sistem"
+    >
+
+    <title>İmtahan Sistemi</title>
+
+
+    <!-- =========================================
+         CSS
+    ========================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="./css/mobile.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="./css/menu.css"
+    >
+
+
+    <!-- =========================================
+         PDF.JS
+    ========================================== -->
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+    ></script>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                İ
+            </div>
+
+            <div>
+
+                <h1 data-i18n="app.name">
+                    İmtahan Sistemi
+                </h1>
+
+                <p data-i18n="app.description">
+                    PDF-dən avtomatik test yarat
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="menuButton"
+            class="menu-button"
+            aria-label="Menyunu aç"
+            aria-expanded="false"
+        >
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </button>
+
+    </header>
+
+
+
+    <main>
+
+
+        <!-- =========================================
+             SETUP SCREEN
+        ========================================== -->
+
+        <section
+            id="setupScreen"
+            class="screen active"
+        >
+
+            <div class="setup-container">
+
+
+                <!-- =========================================
+                     HERO
+                ========================================== -->
+
+                <div class="hero">
+
+                    <span
+                        class="hero-badge"
+                        data-i18n="hero.badge"
+                    >
+                        PDF → İMTAHAN
+                    </span>
+
+
+                    <h2 data-i18n="hero.title">
+                        İmtahanını hazırla
+                    </h2>
+
+
+                    <p data-i18n="hero.description">
+                        PDF faylını yüklə, imtahan növünü,
+                        sual aralığını və vaxtı seç.
+                        Sistem imtahanı avtomatik hazırlayacaq.
+                    </p>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     1. PDF
+                ========================================== -->
+
+                <div class="card">
+
+
+                    <div class="card-header">
+
+                        <span class="step-number">
+                            1
+                        </span>
+
+
+                        <div>
+
+                            <h3 data-i18n="pdf.title">
+                                PDF faylını seç
+                            </h3>
+
+                            <p data-i18n="pdf.subtitle">
+                                İmtahan sualları olan PDF faylını yüklə
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <label
+                        for="pdfFile"
+                        id="uploadArea"
+                        class="upload-area"
+                    >
+
+                        <div class="upload-icon">
+                            ↑
+                        </div>
+
+
+                        <strong data-i18n="pdf.touch">
+                            PDF seçmək üçün toxun
+                        </strong>
+
+
+                        <span data-i18n="pdf.only">
+                            Yalnız .pdf faylları
+                        </span>
+
+
+                        <input
+                            type="file"
+                            id="pdfFile"
+                            accept=".pdf,application/pdf"
+                            hidden
+                        >
+
+                    </label>
+
+
+
+                    <!-- SEÇİLMİŞ PDF -->
+
+                    <div
+                        id="selectedFile"
+                        class="selected-file hidden"
+                    >
+
+                        <div>
+
+                            <strong
+                                id="selectedFileName"
+                            ></strong>
+
+                            <span
+                                id="selectedFileSize"
+                            ></span>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            id="removeFileButton"
+                            class="remove-file"
+                            aria-label="PDF faylını sil"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     2. İMTAHAN NÖVÜ
+                ========================================== -->
+
+                <div class="card">
+
+
+                    <div class="card-header">
+
+                        <span class="step-number">
+                            2
+                        </span>
+
+
+                        <div>
+
+                            <h3 data-i18n="type.title">
+                                İmtahan növü
+                            </h3>
+
+                            <p data-i18n="type.subtitle">
+                                İmtahanda neçə sual olacağını seç
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="choice-grid">
+
+
+                        <!-- SEMESTER -->
+
+                        <label class="choice-card">
+
+                            <input
+                                type="radio"
+                                name="examType"
+                                value="semester"
+                                checked
+                            >
+
+
+                            <div class="choice-content">
+
+                                <strong data-i18n="type.semester">
+                                    Semester
+                                </strong>
+
+                                <span data-i18n="type.semesterCount">
+                                    50 sual
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+
+                        <!-- KOLLOKVIUM -->
+
+                        <label class="choice-card">
+
+                            <input
+                                type="radio"
+                                name="examType"
+                                value="colloquium"
+                            >
+
+
+                            <div class="choice-content">
+
+                                <strong data-i18n="type.colloquium">
+                                    Kollokvium
+                                </strong>
+
+                                <span data-i18n="type.colloquiumCount">
+                                    30 sual
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     3. SUAL ARALIĞI
+                ========================================== -->
+
+                <div class="card">
+
+
+                    <div class="card-header">
+
+                        <span class="step-number">
+                            3
+                        </span>
+
+
+                        <div>
+
+                            <h3 data-i18n="range.title">
+                                Sual aralığı
+                            </h3>
+
+                            <p data-i18n="range.subtitle">
+                                İmtahana düşəcək sualların aralığını seç
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="range-grid">
+
+
+                        <!-- BAŞLANĞIC -->
+
+                        <div class="range-field">
+
+                            <label
+                                for="rangeStart"
+                                data-i18n="range.start"
+                            >
+                                Başlanğıc sual
+                            </label>
+
+
+                            <input
+                                type="number"
+                                id="rangeStart"
+                                min="1"
+                                value="1"
+                                inputmode="numeric"
+                                placeholder="Məsələn: 1"
+                                data-i18n-placeholder="range.startPlaceholder"
+                            >
+
+                        </div>
+
+
+
+                        <!-- SON -->
+
+                        <div class="range-field">
+
+                            <label
+                                for="rangeEnd"
+                                data-i18n="range.end"
+                            >
+                                Son sual
+                            </label>
+
+
+                            <input
+                                type="number"
+                                id="rangeEnd"
+                                min="1"
+                                inputmode="numeric"
+                                placeholder="Məsələn: 200"
+                                data-i18n-placeholder="range.endPlaceholder"
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div
+                        id="rangeInfo"
+                        class="range-info"
+                        data-i18n="range.info"
+                    >
+                        PDF yükləndikdən sonra sual aralığını seçə bilərsən.
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     4. İMTAHAN VAXTI
+                ========================================== -->
+
+                <div class="card">
+
+
+                    <div class="card-header">
+
+                        <span class="step-number">
+                            4
+                        </span>
+
+
+                        <div>
+
+                            <h3 data-i18n="time.title">
+                                İmtahan vaxtı
+                            </h3>
+
+                            <p data-i18n="time.subtitle">
+                                İmtahan müddətini seç
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div
+                        id="timeOptions"
+                        class="time-grid"
+                    >
+                        <!-- JS dolduracaq -->
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     PDF / PARSER STATUS
+                ========================================== -->
+
+                <div
+                    id="parserStatus"
+                    class="parser-status hidden"
+                >
+
+                    <div class="loader"></div>
+
+
+                    <div>
+
+                        <strong
+                            id="parserStatusTitle"
+                            data-i18n="pdf.processing"
+                        >
+                            PDF analiz edilir...
+                        </strong>
+
+
+                        <span
+                            id="parserStatusText"
+                            data-i18n="pdf.questionsPreparing"
+                        >
+                            Suallar hazırlanır
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     ERROR
+                ========================================== -->
+
+                <div
+                    id="setupError"
+                    class="alert alert-error hidden"
+                ></div>
+
+
+
+                <!-- =========================================
+                     START
+                ========================================== -->
+
+                <button
+                    type="button"
+                    id="startExamButton"
+                    class="primary-button start-button"
+                    data-i18n="exam.start"
+                >
+                    İmtahanı hazırla
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================================
+             EXAM SCREEN
+        ========================================== -->
+
+        <section
+            id="examScreen"
+            class="screen"
+        >
+
+            <div class="exam-layout">
+
+
+                <!-- =========================================
+                     TOP BAR
+                ========================================== -->
+
+                <div class="exam-topbar">
+
+
+                    <div>
+
+                        <span
+                            class="exam-label"
+                            data-i18n="exam.label"
+                        >
+                            İmtahan
+                        </span>
+
+
+                        <strong id="examProgress">
+                            Sual 1 / 50
+                        </strong>
+
+                    </div>
+
+
+
+                    <div
+                        id="timer"
+                        class="timer"
+                    >
+                        90:00
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     PROGRESS
+                ========================================== -->
+
+                <div class="progress-track">
+
+                    <div
+                        id="progressBar"
+                        class="progress-bar"
+                    ></div>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     BÜTÜN SUALLARA BAX
+                ========================================== -->
+
+                <div class="question-navigation-card">
+
+
+                    <button
+                        type="button"
+                        id="toggleQuestionsButton"
+                        class="all-questions-button"
+                    >
+
+                        <span data-i18n="exam.allQuestions">
+                            Bütün suallara bax
+                        </span>
+
+
+                        <span id="questionsArrow">
+                            ⌄
+                        </span>
+
+                    </button>
+
+
+
+                    <div
+                        id="questionNavigatorPanel"
+                        class="question-navigator-panel hidden"
+                    >
+
+
+                        <div class="navigator-header">
+
+                            <strong data-i18n="exam.questions">
+                                Suallar
+                            </strong>
+
+
+                            <span id="answeredInfo">
+                                0 / 50 cavablandırılıb
+                            </span>
+
+                        </div>
+
+
+
+                        <div
+                            id="questionNavigator"
+                            class="question-navigator"
+                        ></div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     QUESTION
+                ========================================== -->
+
+                <article class="question-card">
+
+
+                    <div
+                        id="questionNumber"
+                        class="question-number"
+                    >
+                        Sual 1
+                    </div>
+
+
+                    <h2
+                        id="questionText"
+                        class="question-text"
+                    ></h2>
+
+
+                    <div
+                        id="options"
+                        class="options"
+                    ></div>
+
+
+                </article>
+
+
+
+                <!-- =========================================
+                     PREVIOUS / NEXT
+                ========================================== -->
+
+                <div class="exam-actions">
+
+
+                    <button
+                        type="button"
+                        id="previousButton"
+                        class="secondary-button"
+                        data-i18n="exam.previous"
+                    >
+                        ← Geri
+                    </button>
+
+
+
+                    <button
+                        type="button"
+                        id="nextButton"
+                        class="primary-button"
+                        data-i18n="exam.next"
+                    >
+                        İrəli →
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     FINISH
+                ========================================== -->
+
+                <button
+                    type="button"
+                    id="finishExamButton"
+                    class="danger-button finish-button"
+                    data-i18n="exam.finish"
+                >
+                    İmtahanı bitir
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================================
+             RESULT SCREEN
+        ========================================== -->
+
+        <section
+            id="resultScreen"
+            class="screen"
+        >
+
+            <div class="result-container">
+
+
+                <!-- RESULT HERO -->
+
+                <div class="result-hero">
+
+
+                    <span
+                        class="result-label"
+                        data-i18n="result.completed"
+                    >
+                        İmtahan tamamlandı
+                    </span>
+
+
+                    <h2 id="resultPercent">
+                        0%
+                    </h2>
+
+
+                    <p data-i18n="result.successRate">
+                        Müvəffəqiyyət faizi
+                    </p>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     STATS
+                ========================================== -->
+
+                <div class="result-stats">
+
+
+                    <div class="stat-card correct-stat">
+
+                        <span data-i18n="result.correct">
+                            Düzgün
+                        </span>
+
+                        <strong id="correctCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="stat-card wrong-stat">
+
+                        <span data-i18n="result.wrong">
+                            Səhv
+                        </span>
+
+                        <strong id="wrongCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="stat-card empty-stat">
+
+                        <span data-i18n="result.empty">
+                            Boş
+                        </span>
+
+                        <strong id="emptyCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     RESULT ACTIONS
+                ========================================== -->
+
+                <div class="result-actions">
+
+                    <button
+                        type="button"
+                        id="restartButton"
+                        class="primary-button"
+                        data-i18n="result.restart"
+                    >
+                        Yeni imtahan
+                    </button>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     DETAILS
+                ========================================== -->
+
+                <div class="result-section">
+
+
+                    <div class="section-heading">
+
+
+                        <div>
+
+                            <span
+                                class="section-eyebrow"
+                                data-i18n="result.report"
+                            >
+                                Hesabat
+                            </span>
+
+
+                            <h3 data-i18n="result.details">
+                                Detallı nəticələr
+                            </h3>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div
+                        id="resultDetails"
+                        class="result-details"
+                    ></div>
+
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================================
+             HISTORY SCREEN
+        ========================================== -->
+
+        <section
+            id="historyScreen"
+            class="screen"
+        >
+
+            <div class="history-container">
+
+
+                <div class="page-heading">
+
+
+                    <button
+                        type="button"
+                        id="closeHistoryButton"
+                        class="back-button"
+                        data-i18n="common.back"
+                    >
+                        Geri
+                    </button>
+
+
+                    <div>
+
+                        <span
+                            class="section-eyebrow"
+                            data-i18n="history.eyebrow"
+                        >
+                            İmtahanlar
+                        </span>
+
+
+                        <h2 data-i18n="history.title">
+                            Tarixçə
+                        </h2>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div
+                    id="historyList"
+                    class="history-list"
+                ></div>
+
+
+
+                <div
+                    id="emptyHistory"
+                    class="empty-state hidden"
+                >
+
+                    <strong data-i18n="history.empty">
+                        Hələ imtahan yoxdur
+                    </strong>
+
+
+                    <p data-i18n="history.description">
+                        Bitirdiyin imtahanlar burada görünəcək.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================
+     MENU OVERLAY
+========================================== -->
+
+<div
+    id="menuOverlay"
+    class="menu-overlay"
+></div>
+
+
+
+<!-- =========================================
+     SIDE MENU
+========================================== -->
+
+<aside
+    id="sideMenu"
+    class="side-menu"
+    aria-hidden="true"
+>
+
+
+    <!-- MENU HEADER -->
+
+    <div class="menu-header">
+
+
+        <div class="menu-brand">
+
+
+            <div class="menu-logo">
+                İ
+            </div>
+
+
+            <div>
+
+                <strong data-i18n="app.name">
+                    İmtahan Sistemi
+                </strong>
+
+
+                <span data-i18n="app.description">
+                    PDF-dən avtomatik test
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <button
+            type="button"
+            id="closeMenuButton"
+            class="menu-close"
+            aria-label="Menyunu bağla"
+        >
+            ×
+        </button>
+
+
+    </div>
+
+
+
+    <!-- =========================================
+         MENU NAVIGATION
+    ========================================== -->
+
+    <nav class="menu-navigation">
+
+
+        <!-- HOME -->
+
+        <button
+            type="button"
+            class="menu-item active"
+            id="menuHomeButton"
+        >
+
+            <span class="menu-item-icon">
+                ⌂
+            </span>
+
+
+            <span class="menu-item-content">
+
+                <strong data-i18n="menu.home">
+                    Ana səhifə
+                </strong>
+
+
+                <small data-i18n="menu.home.description">
+                    Yeni imtahan hazırla
+                </small>
+
+            </span>
+
+        </button>
+
+
+
+        <!-- HISTORY -->
+
+        <button
+            type="button"
+            class="menu-item"
+            id="menuHistoryButton"
+        >
+
+            <span class="menu-item-icon">
+                ↻
+            </span>
+
+
+            <span class="menu-item-content">
+
+                <strong data-i18n="menu.history">
+                    İmtahan tarixçəsi
+                </strong>
+
+
+                <small data-i18n="menu.history.description">
+                    Əvvəlki nəticələrinə bax
+                </small>
+
+            </span>
+
+        </button>
+
+
+
+        <div class="menu-divider"></div>
+
+
+
+        <!-- ABOUT -->
+
+        <a
+            href="./pages/about.html"
+            class="menu-item"
+        >
+
+            <span class="menu-item-icon">
+                i
+            </span>
+
+
+            <span class="menu-item-content">
+
+                <strong data-i18n="menu.about">
+                    Haqqında
+                </strong>
+
+
+                <small data-i18n="menu.about.description">
+                    Sistem haqqında məlumat
+                </small>
+
+            </span>
+
+
+            <span class="menu-chevron">
+                ›
+            </span>
+
+        </a>
+
+
+
+        <!-- SUPPORT -->
+
+        <a
+            href="./pages/support.html"
+            class="menu-item"
+        >
+
+            <span class="menu-item-icon">
+                ?
+            </span>
+
+
+            <span class="menu-item-content">
+
+                <strong data-i18n="menu.support">
+                    Texniki dəstək
+                </strong>
+
+
+                <small data-i18n="menu.support.description">
+                    Problemlə bağlı müraciət et
+                </small>
+
+            </span>
+
+
+            <span class="menu-chevron">
+                ›
+            </span>
+
+        </a>
+
+
+
+        <!-- GUIDE -->
+
+        <a
+            href="./pages/guide.html"
+            class="menu-item"
+        >
+
+            <span class="menu-item-icon">
+                ✓
+            </span>
+
+
+            <span class="menu-item-content">
+
+                <strong data-i18n="menu.guide">
+                    İstifadə qaydaları
+                </strong>
+
+
+                <small data-i18n="menu.guide.description">
+                    Sistemdən necə istifadə etməli
+                </small>
+
+            </span>
+
+
+            <span class="menu-chevron">
+                ›
+            </span>
+
+        </a>
+
+
+
+        <!-- PRIVACY -->
+
+        <a
+            href="./pages/privacy.html"
+            class="menu-item"
+        >
+
+            <span class="menu-item-icon">
+                ◇
+            </span>
+
+
+            <span class="menu-item-content">
+
+                <strong data-i18n="menu.privacy">
+                    Məxfilik siyasəti
+                </strong>
+
+
+                <small data-i18n="menu.privacy.description">
+                    Məlumatların qorunması
+                </small>
+
+            </span>
+
+
+            <span class="menu-chevron">
+                ›
+            </span>
+
+        </a>
+
+
+    </nav>
+
+
+
+    <!-- =========================================
+         LANGUAGE
+    ========================================== -->
+
+    <div class="menu-language">
+
+
+        <span
+            class="menu-language-title"
+            data-i18n="menu.language"
+        >
+            Dil
+        </span>
+
+
+
+        <div class="language-switcher">
+
+
+            <button
+                type="button"
+                class="language-button"
+                data-lang="az"
+            >
+                AZ
+            </button>
+
+
+            <button
+                type="button"
+                class="language-button"
+                data-lang="en"
+            >
+                EN
+            </button>
+
+
+            <button
+                type="button"
+                class="language-button"
+                data-lang="ru"
+            >
+                RU
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- MENU FOOTER -->
+
+    <div class="menu-footer">
+
+        <strong data-i18n="app.name">
+            İmtahan Sistemi
+        </strong>
+
+
+        <span data-i18n="app.version">
+            Versiya 1.0
+        </span>
+
+    </div>
+
+
+</aside>
+
+
+
+<!-- =========================================
+     FINISH MODAL
+========================================== -->
+
+<div
+    id="finishModal"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+>
+
+
+    <div class="modal-backdrop"></div>
+
+
+
+    <div class="modal-card">
+
+
+        <h3 data-i18n="modal.finish.title">
+            İmtahanı bitirmək istəyirsən?
+        </h3>
+
+
+        <p
+            id="finishModalText"
+            data-i18n="modal.finish.description"
+        >
+            Cavablandırmadığın suallar ola bilər.
+        </p>
+
+
+
+        <div class="modal-actions">
+
+
+            <button
+                type="button"
+                id="cancelFinishButton"
+                class="secondary-button"
+            >
+
+                <span data-i18n="modal.finish.cancel">
+                    Davam et
+                </span>
+
+            </button>
+
+
+
+            <button
+                type="button"
+                id="confirmFinishButton"
+                class="danger-button"
+            >
+
+                <span data-i18n="modal.finish.confirm">
+                    İmtahanı bitir
+                </span>
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================
+     EXAM PREPARATION
+========================================== -->
+
+<div
+    id="examPreparation"
+    class="exam-preparation hidden"
+    aria-live="polite"
+>
+
+
+    <div class="preparation-card">
+
+
+        <div
+            id="preparationVisual"
+            class="preparation-visual"
+        >
+
+            <div class="preparation-spinner"></div>
+
+        </div>
+
+
+
+        <div class="preparation-badge">
+
+            <span data-i18n="preparation.badge">
+                İmtahan sistemi
+            </span>
+
+        </div>
+
+
+
+        <h2
+            id="preparationTitle"
+            data-i18n="preparation.title"
+        >
+            İmtahan hazırlanır
+        </h2>
+
+
+
+        <p
+            id="preparationText"
+            data-i18n="preparation.description"
+        >
+            Suallar yoxlanılır...
+        </p>
+
+
+
+        <div class="preparation-progress">
+
+            <div
+                id="preparationProgressBar"
+                class="preparation-progress-bar"
+            ></div>
+
+        </div>
+
+
+
+        <div
+            id="preparationPercent"
+            class="preparation-percent"
+        >
+
+            <span data-i18n="preparation.percent">
+                0%
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================== -->
+
+<script src="./js/pdfReader.js"></script>
+
+<script src="./js/parser.js"></script>
+
+<script src="./js/timer.js"></script>
+
+<script src="./js/history.js"></script>
+
+<script src="./js/results.js"></script>
+
+<script src="./js/exam.js"></script>
+
+<script src="./js/app.js"></script>
+
+<script src="./js/menu.js"></script>
+
+<script src="./js/language.js"></script>
+
+
+</body>
+
+</html>

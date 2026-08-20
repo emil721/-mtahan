@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Texniki dəstək — İmtahan Sistemi</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/pages.css"
+    >
+</head>
+
+<body data-title-i18n="support.title">
+
+<main class="page-shell">
+
+    <!-- ================================================
+         BACK
+    ================================================= -->
+
+    <div class="page-top">
+
+        <a
+            href="../index.html"
+            class="page-back"
+            data-i18n="support.back"
+        >
+            ← İmtahan sisteminə qayıt
+        </a>
+
+    </div>
+
+
+    <!-- ================================================
+         HERO
+    ================================================= -->
+
+    <section class="page-hero">
+
+        <span
+            class="page-badge"
+            data-i18n="support.badge"
+        >
+            Dəstək
+        </span>
+
+        <h1 data-i18n="support.title">
+            Texniki dəstək
+        </h1>
+
+        <p data-i18n="support.description">
+            Sistemlə bağlı problemlə qarşılaşmısınızsa,
+            aşağıdakı formanı doldurun. Müraciətiniz
+            texniki dəstəyə göndəriləcək.
+        </p>
+
+    </section>
+
+
+    <!-- ================================================
+         SUPPORT FORM
+    ================================================= -->
+
+    <section class="page-card">
+
+        <form
+            id="supportForm"
+            class="support-form"
+        >
+
+            <!-- NAME -->
+
+            <div class="form-field">
+
+                <label
+                    for="supportName"
+                    data-i18n="support.name.label"
+                >
+                    Ad və soyad
+                </label>
+
+                <input
+                    type="text"
+                    id="supportName"
+                    name="name"
+                    placeholder="Adınızı və soyadınızı yazın"
+                    data-i18n-placeholder="support.name.placeholder"
+                    autocomplete="name"
+                    maxlength="100"
+                    required
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-field">
+
+                <label
+                    for="supportEmail"
+                    data-i18n="support.email.label"
+                >
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="supportEmail"
+                    name="email"
+                    placeholder="example@gmail.com"
+                    data-i18n-placeholder="support.email.placeholder"
+                    autocomplete="email"
+                    maxlength="150"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-field">
+
+                <label
+                    for="supportCategory"
+                    data-i18n="support.category.label"
+                >
+                    Problem növü
+                </label>
+
+                <select
+                    id="supportCategory"
+                    name="category"
+                    required
+                >
+
+                    <option
+                        value=""
+                        data-i18n="support.category.choose"
+                    >
+                        Seçin
+                    </option>
+
+                    <option
+                        value="PDF problemi"
+                        data-i18n="support.category.pdf"
+                    >
+                        PDF problemi
+                    </option>
+
+                    <option
+                        value="Sualların çıxarılması"
+                        data-i18n="support.category.questions"
+                    >
+                        Sualların çıxarılması
+                    </option>
+
+                    <option
+                        value="İmtahan problemi"
+                        data-i18n="support.category.exam"
+                    >
+                        İmtahan problemi
+                    </option>
+
+                    <option
+                        value="Nəticə problemi"
+                        data-i18n="support.category.result"
+                    >
+                        Nəticə problemi
+                    </option>
+
+                    <option
+                        value="Sayt problemi"
+                        data-i18n="support.category.website"
+                    >
+                        Sayt problemi
+                    </option>
+
+                    <option
+                        value="Təklif"
+                        data-i18n="support.category.suggestion"
+                    >
+                        Təklif
+                    </option>
+
+                    <option
+                        value="Digər"
+                        data-i18n="support.category.other"
+                    >
+                        Digər
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- SUBJECT -->
+
+            <div class="form-field">
+
+                <label
+                    for="supportSubject"
+                    data-i18n="support.subject.label"
+                >
+                    Mövzu
+                </label>
+
+                <input
+                    type="text"
+                    id="supportSubject"
+                    name="subject"
+                    placeholder="Problemi qısa şəkildə yazın"
+                    data-i18n-placeholder="support.subject.placeholder"
+                    maxlength="150"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MESSAGE -->
+
+            <div class="form-field">
+
+                <label
+                    for="supportMessage"
+                    data-i18n="support.message.label"
+                >
+                    Müraciət
+                </label>
+
+                <textarea
+                    id="supportMessage"
+                    name="message"
+                    placeholder="Qarşılaşdığınız problemi ətraflı izah edin..."
+                    data-i18n-placeholder="support.message.placeholder"
+                    maxlength="3000"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!--
+            =================================================
+            FORMSPREE
+
+            Bunu tərcümə etmirik.
+            İstifadəçi görmür və gələn e-mailin mövzusunun
+            sabit qalması daha yaxşıdır.
+            =================================================
+            -->
+
+            <input
+                type="hidden"
+                name="_subject"
+                value="PDF İmtahan Sistemi — Yeni texniki dəstək müraciəti"
+            >
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                id="supportSubmit"
+                class="support-submit"
+                data-i18n="support.submit"
+            >
+                Müraciəti göndər
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- ================================================
+         FOOTER
+    ================================================= -->
+
+    <footer
+        class="page-footer"
+        data-i18n="support.footer"
+    >
+        İmtahan Sistemi • Versiya 1.0
+    </footer>
+
+</main>
+
+
+<!-- ================================================
+     SUCCESS MODAL
+================================================= -->
+
+<div
+    id="supportSuccessModal"
+    class="support-success-modal"
+    aria-hidden="true"
+>
+
+    <div class="support-success-card">
+
+        <div
+            class="success-check"
+            aria-hidden="true"
+        >
+            ✓
+        </div>
+
+
+        <h2 data-i18n="support.success.title">
+            Müraciət göndərildi!
+        </h2>
+
+
+        <p data-i18n="support.success.description">
+            Müraciətiniz uğurla texniki dəstəyə çatdırıldı.
+            Ən qısa zamanda nəzərdən keçiriləcək.
+        </p>
+
+
+        <button
+            type="button"
+            id="supportSuccessClose"
+            class="success-close-button"
+            data-i18n="support.success.close"
+        >
+            Bağla
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================
+     SCRIPTS
+================================================= -->
+
+<script src="../js/language.js"></script>
+
+<script src="../js/support.js"></script>
+
+</body>
+
+</html>
